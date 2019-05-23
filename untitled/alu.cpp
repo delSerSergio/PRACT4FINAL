@@ -379,3 +379,164 @@ int alu::normalizar(string cadena)
 
     return contador;
 }
+
+funciones alu::opMultiplicacion(float numero1, float numero2){
+
+    cout<<"Inicializamos el algoritmo de la multiplicación: "<<endl;
+
+    union num num1;
+    num1.numero = numero1;
+
+    cout<< "El signo del numero 1 es: " << num1.camposComaFlotante.signo <<endl;
+    cout<< "El exponente del numero 1 es: " << num1.camposComaFlotante.exponente <<endl;
+    cout<< "La mantisa del numero 1 es: " << num1.camposComaFlotante.mantisa <<endl;
+
+    union num num2;
+    num2.numero = numero2;
+
+    cout<< "El signo del numero 2 es: " << num2.camposComaFlotante.signo <<endl;
+    cout<< "El exponente del numero 2 es: " << num2.camposComaFlotante.exponente <<endl;
+    cout<< "La mantisa del numero 2 es: " << num2.camposComaFlotante.mantisa <<endl;
+
+    int signoA = num1.camposComaFlotante.signo;
+    int exponenteA = num1.camposComaFlotante.exponente;
+    int mantisaA = num1.camposComaFlotante.mantisa;
+
+    int signoB = num2.camposComaFlotante.signo;
+    int exponenteB = num2.camposComaFlotante.exponente;
+    int mantisaB = num2.camposComaFlotante.mantisa;
+
+    //PASO 1. Signo del producto
+    int signoProducto = signoA * signoB;
+    cout<< "El signo del producto es: " << signoProducto <<endl;
+
+    //PASO 2. Exponente del producto
+    int exponenteProducto = exponenteA + exponenteB;
+    cout<< "El exponente del producto es: " << exponenteProducto <<endl;
+
+    //PASO3. Calculo de la mantisa
+    int mantisaProducto;
+
+    //PASO 3.1. Algoritmo del producto de enteros sin signo
+        //PASO 1.
+        int P = 0;
+        string manA = std::to_string(mantisaA);
+        string manB = std::to_string(mantisaB);
+        string producto = productoSinSigno(manA, manB);
+        string p = producto.substr(0,24);
+        string a = producto.substr(24,24);
+
+        //PASO 3.2.
+        if(p.at(0) == '0'){
+               string desplazamiento = desplazarDerecha(p+a, 1, 0);
+               p = desplazamiento.substr(0,24);
+               a = desplazamiento.substr(24,24);
+        }
+        else{
+               int solucion = exponenteProducto+1;
+        }
+
+        //PASO 3.3.
+        int redondeo = a.at(0)-48;
+        int st = OR(a.substr(1,24));
+
+        //PASO 3.4.
+        if(((redondeo == 1) && (st==1)) || ((redondeo == 1) && (st == 0) && (p.at(p.length()-1) == '0'))){
+                p = binario(p, "1").substr(1,24);
+        }
+        mantisaProducto = atoi(p.c_str());
+
+        //SOLUCION
+        cout<< "Signo de la solución: " <<signoProducto <<endl;
+        cout<< "Exponente de la solución: "<< exponenteProducto <<endl;
+        cout<< "Mantisa de la solución: " << mantisaProducto <<endl;
+
+}
+
+string alu::productoSinSigno (string mantisa1, string mantisa2){
+
+    string c;
+    string p = "0";
+
+    for(int i=0; i<mantisa1.length(); i++){
+
+        if(mantisa1.at(mantisa1.length()-1) == '1'){
+            cout<< mantisa2 <<endl;
+            string binario = binario(p, mantisa2);
+            c = binario.substr(0,1);
+            p = binario.substr(1,24);
+        }
+        else{
+            string binario = binario(p, "0");
+            c = binario.substr(0,1);
+            p = binario.substr(1,24);
+        }
+        cout<< p + mantisa1 <<endl;
+        string final = desplazarIzquierda(p + mantisa1, 1, atoi(c.c_str()));
+        p = final.substr(0,24);
+        mantisa1 = final.substr(24,24);
+    }
+
+    return p.append(mantisa1);
+
+
+}
+
+string alu::binario(string p, string mantisa){
+    if(p.length() > mantisa.length()){
+        int diferencia = p.length() - mantisa.length();
+        for(int i=0; i < diferencia; i++){
+            p = "0" + mantisa;
+        }
+    }
+    if(p.length() < mantisa.length()){
+        int diferencia = mantisa.length() - p.length();
+        for(int i=0; i < diferencia; i++){
+            p = "0" + p;
+        }
+    }
+    string final = "";
+    int acarreo = 0;
+
+    for(int i=p.length()-1; i >= 0; i--){
+        int aux = (p.at(i)-48) + (mantisa.at(i)-48);
+        if(aux+acarreo == 0){
+            final = "0" + final;
+            acarreo = 0;
+        }
+        else if(aux+acarreo == 1){
+            final = "1" + final;
+            acarreo = 0;
+        }
+        else if(aux+acarreo == 2){
+            final = "0" + final;
+            acarreo = 1;
+        }
+        else{
+            final = "1" + final;
+            acarreo = 1;
+        }
+    }
+
+    final = std::to_string(acarreo) + "" + final;
+    return final;
+}
+
+string alu::desplazarIzquierda(string mantisa, int numeroPosicion, int valor){
+
+    std::bitset<48> mantisa_modificada{mantisa};
+    for(int i=0; i<numeroPosicion; i++){
+        for(int j=0; j<mantisa_modificada.size(); j++){
+            if(j==mantisa_modificada.size()-1){
+                mantisa_modificada[j] = valor;
+            }
+            else{
+                mantisa_modificada[j] = mantisa_modificada[j+1];
+            }
+        }
+    }
+
+    std::string solucion = mantisa_modificada.to_string<char, std::char_traits<char>, std::allocator<char> >();
+
+    return solucion;
+}

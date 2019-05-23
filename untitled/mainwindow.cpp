@@ -49,8 +49,6 @@ void MainWindow::on_transformarNumeros_clicked()
 void MainWindow::on_botonSuma_clicked()
 {
     cout<< "Ha seleccionado la opción de sumar."<<endl;
-    //funciones op1(numero1);
-    //funciones op2(numero2);
 
     alu op;
     op.opSuma(numero1, numero2);
@@ -58,7 +56,10 @@ void MainWindow::on_botonSuma_clicked()
 
 void MainWindow::on_botonProducto_clicked()
 {
+    cout<< "Ha seleccionado la opción de multiplicar."<<endl;
 
+    alu op;
+    op.opMultiplicacion(numero1, numero2);
 }
 
 void MainWindow::on_botonDivision_clicked()
