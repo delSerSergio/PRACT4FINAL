@@ -27,7 +27,6 @@ public:
     string mant2bin;
     funciones opMultiplicacion(float numero1, float numero2);
     string productoSinSigno (string mantisa1, string mantisa2);
-    string binario(string p, string mantisa);
     string desplazarIzquierda(string mantisa, int numeroPosicion, int valor);
 
 private:

@@ -20,6 +20,8 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    string pasoBinario(float num);
+
 private slots:
     void on_transformarNumeros_clicked();
     void on_botonSuma_clicked();

@@ -28,28 +28,6 @@ funciones alu::opSuma(float numero1, float numero2)
 {
     cout<<"Comenzamos con la suma: "<<endl;
 
-    union num num1;
-    num1.numero=numero1;
-
-    cout<<"El signo del numero 1 es: "<<num1.camposComaFlotante.signo<<endl;
-    cout<<"El exponente del numero 1 es: "<< num1.camposComaFlotante.exponente<<endl;
-    cout<<"La mantisa del numero 1 es: "<<num1.camposComaFlotante.mantisa<<endl;
-
-    union num num2;
-    num2.numero=numero2;
-
-    cout<<"El signo del numero 2 es: "<<num2.camposComaFlotante.signo<<endl;
-    cout<<"El exponente del numero 2 es: "<< num2.camposComaFlotante.exponente<<endl;
-    cout<<"La mantisa del numero 2 es: "<<num2.camposComaFlotante.mantisa<<endl;
-
-    int signoA=num1.camposComaFlotante.signo;
-    int exponenteA=num1.camposComaFlotante.exponente;
-    int mantisaA=num1.camposComaFlotante.mantisa;
-
-    int signoB=num2.camposComaFlotante.signo;
-    int exponenteB=num2.camposComaFlotante.exponente;
-    int mantisaB=num2.camposComaFlotante.mantisa;
-
     //PASO 1:
     string P;
     int g =0, r = 0, st = 0;
@@ -57,8 +35,11 @@ funciones alu::opSuma(float numero1, float numero2)
     bool operandosIntercambiados=false;
     bool complementoP=false;
 
+    union num num1;
+    union num num2;
+
     //PASO 2:
-    if(exponenteA<exponenteB)
+    if(num1.camposComaFlotante.signo<num2.camposComaFlotante.signo)
     {
         union num num1;
         union num num2;
@@ -78,10 +59,31 @@ funciones alu::opSuma(float numero1, float numero2)
         cout<<"Numero 2: "<<numero2<<endl;
     }
 
+    num1.numero=numero1;
+
+    cout<<"El signo del numero 1 es: "<<num1.camposComaFlotante.signo<<endl;
+    cout<<"El exponente del numero 1 es: "<< num1.camposComaFlotante.exponente<<endl;
+    cout<<"La mantisa del numero 1 es: "<<num1.camposComaFlotante.mantisa<<endl;
+
+    num2.numero=numero2;
+
+    cout<<"El signo del numero 2 es: "<<num2.camposComaFlotante.signo<<endl;
+    cout<<"El exponente del numero 2 es: "<< num2.camposComaFlotante.exponente<<endl;
+    cout<<"La mantisa del numero 2 es: "<<num2.camposComaFlotante.mantisa<<endl;
+
+    int signoA=num1.camposComaFlotante.signo;
+    int exponenteA=num1.camposComaFlotante.exponente;
+    int mantisaA=num1.camposComaFlotante.mantisa;
+
+    int signoB=num2.camposComaFlotante.signo;
+    int exponenteB=num2.camposComaFlotante.exponente;
+    int mantisaB=num2.camposComaFlotante.mantisa;
+
     //PASO 3:
     int exponenteSolucion=exponenteA;
+    cout<<"El exponente de la solución es: "<<exponenteSolucion<<endl;
     int d=exponenteA-exponenteB;
-
+    cout<<"El valor de d es: "<<d<<endl;
     //
     string num2binario=pasoBinario(numero2);
     string mantisa2=num2binario.substr(9,23);
@@ -91,16 +93,19 @@ funciones alu::opSuma(float numero1, float numero2)
     string mant2bin;
 
     //PASO 4:
+    //PASO 5:
     if(signoA!=signoB)
     {
        cout<<"La mantisa es: "<<mantisaB<<endl;
        mant2bin=complemento2(mantisa2);
        cout<<"El complemento 2 de la mantisaB es: "<<mant2bin<<endl;
+       P=mant2bin;
+    }
+    else
+    {
+        P=mantisa2;
     }
 
-
-    //PASO 5:
-    P=mant2bin;
     cout<<"El valor de P despues de hacer el complemento 2 es: "<<P<<endl;
 
     //PASO 6:
@@ -109,17 +114,20 @@ funciones alu::opSuma(float numero1, float numero2)
     st=OR(P.substr(2,22));
 
     //PASO 7:
-    if(signoA!=signoB)
+    if(d>=0)
     {
-        cout<<"P antes del desplazamiento de signos diferentes es: "<<P<<endl;
-        P=desplazarDerecha(P, d, 1);
-        cout<<"P despues del desplazamiento: "<<P<<endl;
-    }
-    else
-    {
-        cout<<"P antes del desplazamiento de signos iguales es: "<<P<<endl;
-        P=desplazarDerecha(P, d, 0);
-        cout<<"P despues del desplazamiento: "<<P<<endl;
+        if(signoA!=signoB)
+        {
+            cout<<"P antes del desplazamiento de signos diferentes es: "<<P<<endl;
+            P=desplazarDerecha(P, d, 1);
+            cout<<"P despues del desplazamiento: "<<P<<endl;
+        }
+        else
+        {
+            cout<<"P antes del desplazamiento de signos iguales es: "<<P<<endl;
+            P=desplazarDerecha(P, d, 0);
+            cout<<"P despues del desplazamiento: "<<P<<endl;
+        }
     }
 
     //PASO 8:
@@ -134,39 +142,44 @@ funciones alu::opSuma(float numero1, float numero2)
     int acarreo=atoi(P.substr(0,1).c_str());
 
     //PASO 9:
-    if((signoA!=signoB)&&((P.at(P.length()-1)-48)==1)&&(acarreo==1))
+    if(d>=0)
     {
-        cout<<"El elemento P antes de hacer complemento 2 es: "<<P<<endl;
-        P=complemento2(P);
-        cout<<"El elemento P después de hacer complemento 2 es: "<<P<<endl;
-
-        complementoP=true;
-    }
-
-    //PASO 10:
-    else if((signoA==signoB)&&(acarreo==1))
-    {
-        st=r||g||st;
-        r=P.at(P.length()-1)-48;
-        P=desplazarDerecha(P,1,acarreo);
-        exponenteSolucion=exponenteSolucion+1;
-    }
-    else
-    {
-        int k=normalizar(P);
-        if(k==0)
+        if((signoA!=signoB)&&((P.at(P.length()-1)-48)==1)&&(acarreo==1))
         {
-            st=r||st;
-            r=g;
-        }
-        else if(k>1)
-        {
-            r=0;
-            st=0;
+            cout<<"El elemento P antes de hacer complemento 2 es: "<<P<<endl;
+            P=complemento2(P);
+            cout<<"El elemento P después de hacer complemento 2 es: "<<P<<endl;
+
+            complementoP=true;
         }
 
-        P=desplazarDerecha(P, k, g);
-        exponenteSolucion=exponenteSolucion-k;
+        //PASO 10:
+        else if((signoA==signoB)&&(acarreo==1))
+        {
+            st=r||g||st;
+            r=P.at(P.length()-1)-48;
+            P=desplazarDerecha(P,1,acarreo);
+            cout<<"Se suma 1 al exponente: "<<endl;
+            exponenteSolucion=exponenteSolucion+1;
+        }
+        else
+        {
+            int k=normalizar(P);
+            if(k==0)
+            {
+                st=r||st;
+                r=g;
+            }
+            else if(k>1)
+            {
+                r=0;
+                st=0;
+            }
+
+            P=desplazarDerecha(P, k, g);
+            cout<<"Se resta k al exponente: "<<k<<endl;
+            exponenteSolucion=exponenteSolucion-k;
+        }
     }
 
     //PASO 11:
@@ -282,6 +295,7 @@ string alu::desplazarDerecha(string mantisa, int posiciones, int valor)
 
 string alu::sumaBinaria(string cadena1, string cadena2)
 {
+    cout<<"Iniciamos la suma binaria."<<endl;
     int i, anadir, acarreo=0;
     string nuevoP;
 
@@ -336,6 +350,8 @@ string alu::sumaBinaria(string cadena1, string cadena2)
 
 int alu::OR(string cadena)
 {
+    cout<<"Entra en OR."<<endl;
+
     if(cadena.length()==1)
     {
         return atoi(cadena.c_str());
@@ -422,27 +438,42 @@ funciones alu::opMultiplicacion(float numero1, float numero2){
         int P = 0;
         string manA = std::to_string(mantisaA);
         string manB = std::to_string(mantisaB);
+        cout<<"Vamos a realizar el producto sin signo: "<<endl;
         string producto = productoSinSigno(manA, manB);
-        string p = producto.substr(0,24);
-        string a = producto.substr(24,24);
+        string p = producto.substr(0,23);
+        string a = producto.substr(23,23);
+        cout<<"El valor de A es: "<<a<<endl;
+        cout<<"El valor de P es: "<<P<<endl;
 
         //PASO 3.2.
         if(p.at(0) == '0'){
-               string desplazamiento = desplazarDerecha(p+a, 1, 0);
-               p = desplazamiento.substr(0,24);
-               a = desplazamiento.substr(24,24);
+            cout<<".......El valor de A es: "<<a<<endl;
+            cout<<".......El valor de P es: "<<P<<endl;
+               string desplazamiento = desplazarDerecha(producto, 1, 0);
+               cout<<"La nueva cadena de desplazamiento es: "<<desplazamiento<<endl;
+
+               string a=desplazamiento.substr(23,23);
+               string p=desplazamiento.substr(0,23);
+
+               cout<<"El valor de A es: "<<a<<endl;
+               cout<<"El valor de P es: "<<p<<endl;
         }
         else{
                int solucion = exponenteProducto+1;
         }
 
         //PASO 3.3.
+        cout<<"El valor de a es: "<<a<<endl;
+        cout<<"Comenzamos el redondeo."<<endl;
         int redondeo = a.at(0)-48;
-        int st = OR(a.substr(1,24));
+        cout<<"El valor de a es: "<<a<<endl;
+        int st = OR(a.substr(1,23));
+        cout<<"Salimos de OR."<<endl;
 
         //PASO 3.4.
-        if(((redondeo == 1) && (st==1)) || ((redondeo == 1) && (st == 0) && (p.at(p.length()-1) == '0'))){
-                p = binario(p, "1").substr(1,24);
+        if((((redondeo == 1) && (st==1))) || (((redondeo == 1) && (st == 0) && (p.at(p.length()-1) == '0')))){
+                cout<<"Comenzamos suma binaria."<<endl;
+            p = sumaBinaria(p, "1");
         }
         mantisaProducto = atoi(p.c_str());
 
@@ -455,6 +486,7 @@ funciones alu::opMultiplicacion(float numero1, float numero2){
 
 string alu::productoSinSigno (string mantisa1, string mantisa2){
 
+    cout<<"Entra en el producto sin signo. "<<endl;
     string c;
     string p = "0";
 
@@ -462,12 +494,13 @@ string alu::productoSinSigno (string mantisa1, string mantisa2){
 
         if(mantisa1.at(mantisa1.length()-1) == '1'){
             cout<< mantisa2 <<endl;
-            string binario = binario(p, mantisa2);
+            string binario = sumaBinaria(p, mantisa2);
+            cout<<"El resultado de la suma binaria es: "<<binario<<endl;
             c = binario.substr(0,1);
             p = binario.substr(1,24);
         }
         else{
-            string binario = binario(p, "0");
+            string binario = sumaBinaria(p, "0");
             c = binario.substr(0,1);
             p = binario.substr(1,24);
         }
@@ -477,49 +510,10 @@ string alu::productoSinSigno (string mantisa1, string mantisa2){
         mantisa1 = final.substr(24,24);
     }
 
+    cout<<"Sale del producto sin signo."<<endl;
     return p.append(mantisa1);
 
 
-}
-
-string alu::binario(string p, string mantisa){
-    if(p.length() > mantisa.length()){
-        int diferencia = p.length() - mantisa.length();
-        for(int i=0; i < diferencia; i++){
-            p = "0" + mantisa;
-        }
-    }
-    if(p.length() < mantisa.length()){
-        int diferencia = mantisa.length() - p.length();
-        for(int i=0; i < diferencia; i++){
-            p = "0" + p;
-        }
-    }
-    string final = "";
-    int acarreo = 0;
-
-    for(int i=p.length()-1; i >= 0; i--){
-        int aux = (p.at(i)-48) + (mantisa.at(i)-48);
-        if(aux+acarreo == 0){
-            final = "0" + final;
-            acarreo = 0;
-        }
-        else if(aux+acarreo == 1){
-            final = "1" + final;
-            acarreo = 0;
-        }
-        else if(aux+acarreo == 2){
-            final = "0" + final;
-            acarreo = 1;
-        }
-        else{
-            final = "1" + final;
-            acarreo = 1;
-        }
-    }
-
-    final = std::to_string(acarreo) + "" + final;
-    return final;
 }
 
 string alu::desplazarIzquierda(string mantisa, int numeroPosicion, int valor){
